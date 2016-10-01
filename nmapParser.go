@@ -88,6 +88,7 @@ type nmaprun struct {
 	Hosts   []Host   `xml:"host"`
 }
 
+//Parse xml file to GO structure
 func Parse(REPORT_FILE *string) (*nmaprun, error) {
 	REPORT := nmaprun{}
 	xmlContent, _ := ioutil.ReadFile(*REPORT_FILE)
@@ -98,6 +99,7 @@ func Parse(REPORT_FILE *string) (*nmaprun, error) {
 	return &REPORT, nil
 }
 
+//Parse output from smb-os-discovery script to GO structure
 func SmbScriptParse(output *string) *SMBOSDiscovery {
 	arr := strings.Split(*output, "\n  ")[1:]
 	buf := SMBOSDiscovery{}
