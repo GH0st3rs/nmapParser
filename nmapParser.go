@@ -10,8 +10,6 @@ import (
 type SMBOSDiscovery struct {
 	OS          string
 	LanManager  string
-	DomainDNS   string
-	ForestDNS   string
 	CPE         string
 	Workgroup   string
 	NetBIOS     string
@@ -108,8 +106,6 @@ func SmbScriptParse(output *string) *SMBOSDiscovery {
 	buf.NetBIOS = arr[3][len("NetBIOS computer name: "):]
 	buf.OS = arr[0][len("OS: "):strings.Index(arr[0], " (")]
 	buf.LanManager = arr[0][strings.Index(arr[0], " (")+2 : strings.LastIndex(arr[0], ")")]
-	buf.DomainDNS = arr[4][len("Domain name: "):]
-	buf.ForestDNS = arr[5][len("Forest name: "):]
 	buf.NetworkName = arr[2][len("Computer name: "):]
 	return &buf
 }
