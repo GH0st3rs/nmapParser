@@ -4,6 +4,7 @@ package nmapParser
 import (
 	"encoding/xml"
 	"io/ioutil"
+	"regexp"
 	"strings"
 )
 
@@ -11,7 +12,6 @@ type SMBOSDiscovery struct {
 	OS          string
 	LanManager  string
 	CPE         string
-	Workgroup   string
 	NetBIOS     string
 	FQDN        string
 	NetworkName string
@@ -101,11 +101,39 @@ func Parse(REPORT_FILE *string) (*nmaprun, error) {
 func SmbScriptParse(output *string) *SMBOSDiscovery {
 	arr := strings.Split(*output, "\n  ")[1:]
 	buf := SMBOSDiscovery{}
-	buf.CPE = arr[1][8:]
-	buf.FQDN = arr[6][len("FQDN: "):]
-	buf.NetBIOS = arr[3][len("NetBIOS computer name: "):]
-	buf.OS = arr[0][len("OS: "):strings.Index(arr[0], " (")]
-	buf.LanManager = arr[0][strings.Index(arr[0], " (")+2 : strings.LastIndex(arr[0], ")")]
-	buf.NetworkName = arr[2][len("Computer name: "):]
+	for _, item := range arr {
+		if match, _ := regexp.MatchString(`OS: ([a-zA-Z0-9]+) ([\(\)\a-zA-Z0-9\.]+)`, item); match {
+			match, _ := regexp.Compile(`OS: ([a-zA-Z0-9]+) ([\(\)\a-zA-Z0-9\.]+)`)
+			result := match.FindStringSubmatch(item)
+			if len(result) == 3 {
+				buf.OS = result[1]
+				buf.LanManager = result[2]
+			}
+		} else if match, _ := regexp.MatchString(`Computer name: ([a-zA-Z0-9\.\-]+)`, item); match {
+			match, _ := regexp.Compile(`Computer name: ([a-zA-Z0-9\.\-]+)`)
+			result := match.FindStringSubmatch(item)
+			if len(result) == 2 {
+				buf.NetworkName = result[1]
+			}
+		} else if match, _ := regexp.MatchString(`NetBIOS computer name: ([a-zA-Z0-9\.\-]+)`, item); match {
+			match, _ := regexp.Compile(`NetBIOS computer name: ([a-zA-Z0-9\.\-]+)`)
+			result := match.FindStringSubmatch(item)
+			if len(result) == 2 {
+				buf.NetBIOS = result[1]
+			}
+		} else if match, _ := regexp.MatchString(`FQDN: ([a-zA-Z0-9\.\-]+)`, item); match {
+			match, _ := regexp.Compile(`FQDN: ([a-zA-Z0-9\.\-]+)`)
+			result := match.FindStringSubmatch(item)
+			if len(result) == 2 {
+				buf.FQDN = result[1]
+			}
+		} else if match, _ := regexp.MatchString(`OS CPE: ([a-zA-Z0-9\.\-\:\/]+)`, item); match {
+			match, _ := regexp.Compile(`OS CPE: ([a-zA-Z0-9\.\-\:\/]+)`)
+			result := match.FindStringSubmatch(item)
+			if len(result) == 2 {
+				buf.CPE = result[1]
+			}
+		}
+	}
 	return &buf
 }
