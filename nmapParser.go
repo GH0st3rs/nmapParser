@@ -8,6 +8,35 @@ import (
 	"strings"
 )
 
+type DNSPrinterServiceDiscovery struct {
+	PortName string
+	PortInfo PrinterPortInfo
+}
+
+type PrinterPortInfo struct {
+	TxtVers  int
+	QTotal   int
+	PDL      string
+	RP       string //ipp/print
+	URF      string //V1.3,CP99,W8,OB10,PQ3-4-5,IS1-2-4,MT1-2-3-4-5,RS600
+	TY       string //HP LaserJet Pro MFP M435nw
+	Product  string //(HP LaserJet Pro MFP M435nw)
+	Priority int    //10
+	AdminURL string //http://NPI6807EB.local./hp/device/info_config_AirPrint.html?tab=Networking&menu=AirPrintStatus
+	Note     string //
+	Color    string //F
+	Duplex   string //F
+	Scan     string //T
+	Fax      string //F
+	UUID     string //434e4238-4639-3536-3933-a0481c6807eb
+	kind     string //document,envelope,photo
+	PaperMax string //legal-A4
+	TLS      string //1.2
+	usb_MFG  string //Hewlett-Packard
+	usb_MDL  string //HP LaserJet Pro MFP M435nw
+	mac      string //a0:48:1c:68:07:eb
+}
+
 type SMBOSDiscovery struct {
 	OS          string
 	LanManager  string
@@ -29,6 +58,7 @@ type PortService struct {
 	Ver       string   `xml:"version,attr"`
 	OsType    string   `xml:"ostype,attr"`
 	ExtraInfo string   `xml:"extrainfo,attr"`
+	HostName  string   `xml:"hostname,attr"`
 	CPE       []string `xml:"cpe"`
 }
 
@@ -128,7 +158,7 @@ func SmbScriptParse(output *string) *SMBOSDiscovery {
 				buf.FQDN = result[1]
 			}
 		} else if match, _ := regexp.MatchString(`OS CPE: ([a-zA-Z0-9\.\-\:\/]+)`, item); match {
-			match, _ := regexp.Compile(`OS CPE: ([a-zA-Z0-9\.\-\:\/]+)`)
+			match, _ := regexp.Compile(`OS CPE: ([a-zA-Z0-9\.\-\:\/\_]+)`)
 			result := match.FindStringSubmatch(item)
 			if len(result) == 2 {
 				buf.CPE = result[1]
@@ -136,4 +166,13 @@ func SmbScriptParse(output *string) *SMBOSDiscovery {
 		}
 	}
 	return &buf
+}
+
+//Parse output from dns-service-discovery script to GO structure
+func DnsDiscoveryScriptParse(output *string) {
+	arr := strings.Split(*output, "\n  ")[1:]
+	buf := []DNSPrinterServiceDiscovery{}
+	for _, item := range arr {
+
+	}
 }
