@@ -170,9 +170,9 @@ func SmbScriptParse(output *string) *SMBOSDiscovery {
 
 //Parse output from dns-service-discovery script to GO structure
 func DnsDiscoveryScriptParse(output *string) {
-	arr := strings.Split(*output, "\n  ")[1:]
-	buf := []DNSPrinterServiceDiscovery{}
-	for _, item := range arr {
+	//	arr := strings.Split(*output, "\n  ")[1:]
+	//	buf := []DNSPrinterServiceDiscovery{}
+	//	for _, item := range arr {
 
-	}
+	//	}
 }
