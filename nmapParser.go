@@ -76,7 +76,7 @@ type Port struct {
 	Protocol string      `xml:"protocol,attr"`
 	State    Status      `xml:"state"`
 	Service  PortService `xml:"service"`
-	Script   Script      `xml:"script"`
+	Script  []Script      `xml:"script"`
 }
 
 type OSClass struct {
